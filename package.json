@@ -1,0 +1,25 @@
+{
+  "name": "react-native-ezviz",
+  "version": "0.0.1",
+  "description": "## Android配置 1. gradle.properties 文件增加 EZVIZ_APP_KEY",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plotozhu/react-native-ezviz.git"
+  },
+  "author": "lumin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/plotozhu/react-native-ezviz/issues"
+  },
+  "homepage": "https://github.com/plotozhu/react-native-ezviz#readme",
+  "keywords": [
+    "react",
+    "native",
+    "ezviz",
+    "hikvision"
+  ]
+}
