@@ -3,7 +3,7 @@ import {
   requireNativeComponent
 } from 'react-native';
 
-let { EzvizModule } = NativeModules;
+export var { EzvizModule } = NativeModules;
 
 export var setAccessToken = EzvizModule.setAccessToken;
 export var getCameraList = EzvizModule.getCameraList;
