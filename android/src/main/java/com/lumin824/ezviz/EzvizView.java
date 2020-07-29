@@ -52,7 +52,7 @@ public class EzvizView extends ViewGroup {
     @Override
     @SuppressLint("DrawAllocation")
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        mSurfaceViewRenderer.layout(left, top, right, bottom);
+        mSurfaceViewRenderer.layout(0, 0, right - left, bottom- top);
     }
 
     private class GetDeviceInfoistTask extends AsyncTask<String, Void, EZDeviceInfo> {
