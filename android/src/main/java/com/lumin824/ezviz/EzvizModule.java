@@ -10,6 +10,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.videogo.exception.BaseException;
 import com.videogo.openapi.EZOpenSDK;
 import com.videogo.openapi.bean.EZCameraInfo;
@@ -27,6 +28,7 @@ import javax.annotation.Nullable;
 public class EzvizModule extends ReactContextBaseJavaModule {
   private static final String TAG = EzvizModule.class.getSimpleName();
   private static String APP_KEY = BuildConfig.APP_KEY;
+  private static ReactApplicationContext mContext;
   private boolean mInit = false;
 
   public EzvizModule(ReactApplicationContext reactContext) {
@@ -41,8 +43,8 @@ public class EzvizModule extends ReactContextBaseJavaModule {
   @Override
   public void initialize() {
     super.initialize();
-
-    Application application = (Application) getReactApplicationContext().getBaseContext();
+    mContext = getReactApplicationContext();
+    Application application = (Application) mContext.getBaseContext();
 
     EZOpenSDK.initLib(application, APP_KEY,"");
     EZOpenSDK.showSDKLog(true);
@@ -60,6 +62,11 @@ public class EzvizModule extends ReactContextBaseJavaModule {
   public void onCatalystInstanceDestroy() {
     super.onCatalystInstanceDestroy();
     EZOpenSDK.finiLib();
+  }
+
+  static void sendEvent(String eventName, @Nullable WritableMap params) {
+    mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+            .emit(eventName, params);
   }
 
   @ReactMethod

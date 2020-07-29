@@ -23,7 +23,7 @@ public class EzvizManager extends SimpleViewManager<EzvizView> {
     @Override
     public void onDropViewInstance(EzvizView view) {
         super.onDropViewInstance(view);
-        view.stopRealPlay();
+        view.release();
     }
 
     @ReactProp(name="deviceSerial")
