@@ -7,8 +7,8 @@
 
 -(void)setCameraId:(NSString*)cameraId
 {
-    EZPlayer* player = [EZOpenSDK createPlayerWithCameraId:cameraId];
-    [player setPlayerView:self];
-    [player startRealPlay];
+//    EZPlayer* player = [EZOpenSDK createPlayerWithCameraId:cameraId];
+//    [player setPlayerView:self];
+//    [player startRealPlay];
 }
 @end
