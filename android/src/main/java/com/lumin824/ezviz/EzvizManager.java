@@ -30,4 +30,9 @@ public class EzvizManager extends SimpleViewManager<EzvizView> {
     public void setDeviceSerial(EzvizView view, String deviceSerial){
         view.setDeviceSerial(deviceSerial);
     }
+
+    @ReactProp(name="verifyCode")
+    public void setVerifyCode(EzvizView view, String verifyCode){
+        view.setVerifyCode(verifyCode);
+    }
 }

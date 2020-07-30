@@ -52,7 +52,7 @@ public class EzvizView extends ViewGroup {
     @Override
     @SuppressLint("DrawAllocation")
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        mSurfaceViewRenderer.layout(0, 0, right - left, bottom- top);
+        mSurfaceViewRenderer.layout(0, 0, right - left, bottom - top);
     }
 
     private class GetDeviceInfoistTask extends AsyncTask<String, Void, EZDeviceInfo> {
@@ -65,6 +65,8 @@ public class EzvizView extends ViewGroup {
 
         @Override
         protected EZDeviceInfo doInBackground(String... params) {
+            WritableMap msg = new WritableNativeMap();
+
             try {
                 EZDeviceInfo deviceInfo = EZOpenSDK.getInstance().getDeviceInfo(deviceSerial);
 
@@ -72,6 +74,12 @@ public class EzvizView extends ViewGroup {
             } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
                 mErrorCode = errorInfo.errorCode;
+
+                msg.putString("type", "MSG_GET_DEVICE_INFO_FAIL");
+                msg.putInt("errorCode", errorInfo.errorCode);
+                msg.putString("description", errorInfo.description);
+                EzvizModule.sendEvent("EzvizPlayEvent", msg);
+
                 LogUtil.d(TAG, errorInfo.toString());
 
                 return null;
@@ -80,30 +88,35 @@ public class EzvizView extends ViewGroup {
 
         @Override
         protected void onPostExecute(EZDeviceInfo result) {
-            if(result == null){
+            if (result == null) {
                 Log.d(TAG, "获取设备信息失败，请检查设备序列号是否正确！");
-            }else{
+            } else {
                 mDeviceInfo = result;
                 mCameraInfo = mDeviceInfo.getCameraInfoList().get(0);
 
                 mSurfaceViewRenderer.setDeviceInfo(mDeviceInfo);
+
                 mSurfaceViewRenderer.startRealPlay();
             }
         }
     }
 
-    public void setDeviceSerial(String deviceSerial){
-        if(mSurfaceViewRenderer != null){
+    public void setDeviceSerial(String deviceSerial) {
+        if (mSurfaceViewRenderer != null) {
             mSurfaceViewRenderer.stopRealPlay();
         }
 
-        if(deviceSerial != null) {
+        if (deviceSerial != null) {
             new GetDeviceInfoistTask(deviceSerial).execute();
         }
     }
 
-    public void release(){
-        if(mSurfaceViewRenderer != null){
+    public void setVerifyCode(String verifyCode) {
+        mSurfaceViewRenderer.setVerifyCode(verifyCode);
+    }
+
+    public void release() {
+        if (mSurfaceViewRenderer != null) {
             mSurfaceViewRenderer.stopRealPlay();
             mSurfaceViewRenderer = null;
         }

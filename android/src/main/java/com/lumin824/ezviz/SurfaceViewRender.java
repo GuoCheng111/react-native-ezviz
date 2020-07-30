@@ -24,7 +24,7 @@ import com.videogo.util.LogUtil;
 
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
-public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Callback,Handler.Callback{
+public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Callback, Handler.Callback {
     private static final String TAG = SurfaceViewRender.class.getSimpleName();
 
     private SurfaceHolder mRealPlaySh = null;
@@ -35,6 +35,7 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
 
     private EZDeviceInfo mDeviceInfo = null;
     private EZCameraInfo mCameraInfo = null;
+    private String mVerifyCode = null;
 
     public SurfaceViewRender(Context context) {
         super(context);
@@ -47,12 +48,16 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
         this.setZOrderMediaOverlay(true);
     }
 
-    public void setDeviceInfo(EZDeviceInfo deviceInfo){
+    public void setVerifyCode(String verifyCode) {
+        mVerifyCode = verifyCode;
+    }
+
+    public void setDeviceInfo(EZDeviceInfo deviceInfo) {
         mDeviceInfo = deviceInfo;
         mCameraInfo = mDeviceInfo.getCameraInfoList().get(0);
 
         EZOpenSDK ezOpenSDK = EZOpenSDK.getInstance();
-        if(mCameraInfo != null) {
+        if (mCameraInfo != null) {
             if (mEzPlayer != null) {
                 ezOpenSDK.releasePlayer(mEzPlayer);
             }
@@ -60,20 +65,21 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
         }
     }
 
-    public void startRealPlay(){
-        if(mEzPlayer == null)
+    public void startRealPlay() {
+        if (mEzPlayer == null)
             return;
 
         mEzPlayer.setHandler(mHandler);
 
         mEzPlayer.setSurfaceHold(getHolder());
+        mEzPlayer.setPlayVerifyCode(mVerifyCode);
         mEzPlayer.startRealPlay();
     }
 
-    public  void stopRealPlay(){
-        if(mEzPlayer == null)
+    public void stopRealPlay() {
+        if (mEzPlayer == null)
             return;
-        if(mStatus == RealPlayStatus.STATUS_INIT)
+        if (mStatus == RealPlayStatus.STATUS_INIT)
             return;
 
         mEzPlayer.stopRealPlay();
@@ -133,7 +139,7 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
                 break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_FAIL:
                 mStatus = RealPlayStatus.STATUS_INIT;
-                ErrorInfo errorInfo = (ErrorInfo)msg.obj;
+                ErrorInfo errorInfo = (ErrorInfo) msg.obj;
                 params.putString("type", "MSG_REALPLAY_PLAY_FAIL");
                 params.putInt("errorCode", errorInfo.errorCode);
                 params.putString("description", errorInfo.description);
