@@ -26,87 +26,93 @@ import javax.annotation.Nullable;
 
 
 public class EzvizModule extends ReactContextBaseJavaModule {
-  private static final String TAG = EzvizModule.class.getSimpleName();
-  private static String APP_KEY = BuildConfig.APP_KEY;
-  private static ReactApplicationContext mContext;
-  private boolean mInit = false;
+    private static final String TAG = EzvizModule.class.getSimpleName();
+    private static ReactApplicationContext mContext;
+    private boolean mInit = false;
 
-  public EzvizModule(ReactApplicationContext reactContext) {
-    super(reactContext);
-  }
-
-  @Override
-  public String getName(){
-    return "EzvizModule";
-  }
-
-  @Override
-  public void initialize() {
-    super.initialize();
-    mContext = getReactApplicationContext();
-    Application application = (Application) mContext.getBaseContext();
-
-    EZOpenSDK.initLib(application, APP_KEY,"");
-    EZOpenSDK.showSDKLog(true);
-    // 设置是否支持P2P取流,详见api
-    EZOpenSDK.enableP2P(true);
-    // APP_KEY请替换成自己申请的
-    if (!EZOpenSDK.initLib(application, APP_KEY)) {
-      Log.d(TAG, "EZOpenSDK.initLib error");
-      return;
+    public EzvizModule(ReactApplicationContext reactContext) {
+        super(reactContext);
     }
-    mInit = true;
-  }
 
-  @Override
-  public void onCatalystInstanceDestroy() {
-    super.onCatalystInstanceDestroy();
-    EZOpenSDK.finiLib();
-  }
+    @Override
+    public String getName() {
+        return "EzvizModule";
+    }
 
-  static void sendEvent(String eventName, @Nullable WritableMap params) {
-    mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-            .emit(eventName, params);
-  }
+    @Override
+    public void initialize() {
+        super.initialize();
+        mContext = getReactApplicationContext();
+    }
 
-  @ReactMethod
-  public void setAccessToken(String accessToken, Promise promise){
-    if(!mInit)
-      promise.reject("INIT_ERROR", "init error");
-    EZOpenSDK.getInstance().setAccessToken(accessToken);
-    promise.resolve(null);
-  }
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        EZOpenSDK.finiLib();
+    }
 
-  @ReactMethod
-  public void getCameraList(Promise promise){
+    static void sendEvent(String eventName, @Nullable WritableMap params) {
+        mContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    }
 
-  }
+    @ReactMethod
+    public void init(String appKey, Promise promise) {
+        Log.d(TAG, "init! appKey : " + appKey);
+        Application application = (Application) mContext.getBaseContext();
 
-  @ReactMethod
-  public void getDeviceInfo(String cameraId, Promise promise){
+        EZOpenSDK.showSDKLog(true);
+        // 设置是否支持P2P取流,详见api
+        EZOpenSDK.enableP2P(true);
+        // APP_KEY请替换成自己申请的
+        if (!EZOpenSDK.initLib(application, appKey)) {
+            Log.d(TAG, "EZOpenSDK.initLib error");
+            promise.reject("ERROR_INIT", "EZOpenSDK.initLib error");
+            return;
+        }
 
-  }
+        mInit = true;
+        promise.resolve(null);
+    }
 
-  @ReactMethod
-  public void getDeviceList(Promise promise){
+    @ReactMethod
+    public void setAccessToken(String accessToken, Promise promise) {
+        if (!mInit)
+            promise.reject("INIT_ERROR", "init error");
+        EZOpenSDK.getInstance().setAccessToken(accessToken);
+        promise.resolve(null);
+    }
 
-  }
+    @ReactMethod
+    public void getCameraList(Promise promise) {
 
-  @ReactMethod
-  public void controlPTZ(String cameraId, String command, String action, int speed, Promise promise){
+    }
 
-  }
+    @ReactMethod
+    public void getDeviceInfo(String cameraId, Promise promise) {
 
-  @Nullable
-  @Override
-  public Map<String, Object> getConstants() {
-    final Map<String, Object> constants = new HashMap<>();
-    constants.put("EZPTZAction_EZPTZActionSTART", EZPTZAction.EZPTZActionSTART.name());
-    constants.put("EZPTZAction_EZPTZActionSTOP", EZPTZAction.EZPTZActionSTOP.name());
-    constants.put("EZPTZCommand_EZPTZCommandLeft", EZPTZCommand.EZPTZCommandLeft.name());
-    constants.put("EZPTZCommand_EZPTZCommandRight", EZPTZCommand.EZPTZCommandRight.name());
-    constants.put("EZPTZCommand_EZPTZCommandUp", EZPTZCommand.EZPTZCommandUp.name());
-    constants.put("EZPTZCommand_EZPTZCommandDown", EZPTZCommand.EZPTZCommandDown.name());
-    return constants;
-  }
+    }
+
+    @ReactMethod
+    public void getDeviceList(Promise promise) {
+
+    }
+
+    @ReactMethod
+    public void controlPTZ(String cameraId, String command, String action, int speed, Promise promise) {
+
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> getConstants() {
+        final Map<String, Object> constants = new HashMap<>();
+        constants.put("EZPTZAction_EZPTZActionSTART", EZPTZAction.EZPTZActionSTART.name());
+        constants.put("EZPTZAction_EZPTZActionSTOP", EZPTZAction.EZPTZActionSTOP.name());
+        constants.put("EZPTZCommand_EZPTZCommandLeft", EZPTZCommand.EZPTZCommandLeft.name());
+        constants.put("EZPTZCommand_EZPTZCommandRight", EZPTZCommand.EZPTZCommandRight.name());
+        constants.put("EZPTZCommand_EZPTZCommandUp", EZPTZCommand.EZPTZCommandUp.name());
+        constants.put("EZPTZCommand_EZPTZCommandDown", EZPTZCommand.EZPTZCommandDown.name());
+        return constants;
+    }
 }
