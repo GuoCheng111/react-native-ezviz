@@ -69,6 +69,9 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
         if (mEzPlayer == null)
             return;
 
+        if (mStatus == RealPlayStatus.STATUS_PLAY)
+            return;
+
         mEzPlayer.setHandler(mHandler);
 
         mEzPlayer.setSurfaceHold(getHolder());
@@ -79,10 +82,56 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
     public void stopRealPlay() {
         if (mEzPlayer == null)
             return;
-        if (mStatus == RealPlayStatus.STATUS_INIT)
+        if (mStatus == RealPlayStatus.STATUS_STOP)
             return;
 
         mEzPlayer.stopRealPlay();
+    }
+
+    public boolean openSound() {
+        if (mEzPlayer == null)
+            return false;
+
+        if (!mDeviceInfo.isSupportAudioOnOff())
+            return false;
+
+        return mEzPlayer.openSound();
+    }
+
+    public boolean closeSound() {
+        if (mEzPlayer == null)
+            return false;
+
+        if (!mDeviceInfo.isSupportAudioOnOff())
+            return false;
+
+        return mEzPlayer.closeSound();
+    }
+
+    public boolean startVoiceTalk() {
+        if (mEzPlayer == null)
+            return false;
+
+        if (mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport)
+            return false;
+
+        return mEzPlayer.startVoiceTalk();
+    }
+
+    public boolean stopVoiceTalk() {
+        if (mEzPlayer == null)
+            return false;
+
+        if (mDeviceInfo.isSupportTalk() != EZConstants.EZTalkbackCapability.EZTalkbackNoSupport)
+            return false;
+
+        return mEzPlayer.stopVoiceTalk();
+    }
+
+    public void release() {
+        stopRealPlay();
+        mEzPlayer.release();
+        mEzPlayer = null;
     }
 
     @Override
@@ -93,7 +142,6 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
         }
 
         if (mStatus == RealPlayStatus.STATUS_INIT) {
-
             // 开始播放
             startRealPlay();
         }
@@ -120,22 +168,19 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
     @SuppressLint("NewApi")
     @Override
     public boolean handleMessage(Message msg) {
-        LogUtil.i(TAG, "handleMessage:" + msg.what);
+        LogUtil.i(TAG, "handleMessage:" + msg.toString());
         WritableMap params = new WritableNativeMap();
         switch (msg.what) {
-            case MSG_VIDEO_SIZE_CHANGED:
-                break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_CONNECTION_START:
+                params.putString("type", "MSG_REALPLAY_CONNECTION_START");
                 break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_START:
                 mStatus = RealPlayStatus.STATUS_START;
                 params.putString("type", "MSG_REALPLAY_PLAY_START");
-                EzvizModule.sendEvent("EzvizPlayEvent", params);
                 break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_SUCCESS:
                 mStatus = RealPlayStatus.STATUS_PLAY;
                 params.putString("type", "MSG_REALPLAY_PLAY_SUCCESS");
-                EzvizModule.sendEvent("EzvizPlayEvent", params);
                 break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_FAIL:
                 mStatus = RealPlayStatus.STATUS_INIT;
@@ -143,11 +188,24 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
                 params.putString("type", "MSG_REALPLAY_PLAY_FAIL");
                 params.putInt("errorCode", errorInfo.errorCode);
                 params.putString("description", errorInfo.description);
-                EzvizModule.sendEvent("EzvizPlayEvent", params);
+                break;
+            case EZConstants.EZRealPlayConstants.MSG_REALPLAY_STOP_SUCCESS:
+                mStatus = RealPlayStatus.STATUS_STOP;
+                params.putString("type", "MSG_REALPLAY_STOP_SUCCESS");
+                break;
+            case EZConstants.EZRealPlayConstants.MSG_PTZ_SET_SUCCESS:
+                params.putString("type", "MSG_PTZ_SET_SUCCESS");
+                break;
+            case EZConstants.EZRealPlayConstants.MSG_PTZ_SET_FAIL:
+                params.putString("type", "MSG_PTZ_SET_FAIL");
                 break;
             default:
+                params.putString("type", "UN_KNOW");
+                params.putString("message", msg.toString());
                 break;
         }
+
+        EzvizModule.sendEvent("EzvizPlayEvent", params);
         return false;
     }
 }

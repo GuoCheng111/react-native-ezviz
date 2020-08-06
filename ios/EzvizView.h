@@ -3,5 +3,6 @@
 
 @interface EzvizView : UIView
 
-@property NSString* cameraId;
+@property (nonatomic) NSString* deviceSerial;
+@property (nonatomic) NSString* verifyCode;
 @end

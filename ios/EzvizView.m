@@ -5,10 +5,22 @@
 
 @implementation EzvizView
 
--(void)setCameraId:(NSString*)cameraId
+-(void)setDeviceSerial:(NSString*)deviceSerial
 {
 //    EZPlayer* player = [EZOpenSDK createPlayerWithCameraId:cameraId];
 //    [player setPlayerView:self];
 //    [player startRealPlay];
+}
+
+-(void)setVerifyCode:(NSString*)verifyCode
+{
+//    EZPlayer* player = [EZOpenSDK createPlayerWithCameraId:cameraId];
+//    [player setPlayerView:self];
+//    [player startRealPlay];
+}
+
+-(void)play
+{
+    
 }
 @end

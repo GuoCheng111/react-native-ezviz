@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -28,9 +29,6 @@ import com.videogo.util.LogUtil;
 
 import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
-/**
- * Created by lumin on 16/7/2.
- */
 public class EzvizView extends ViewGroup {
     private static final String TAG = EzvizView.class.getSimpleName();
     private EZDeviceInfo mDeviceInfo = null;
@@ -68,8 +66,8 @@ public class EzvizView extends ViewGroup {
             WritableMap msg = new WritableNativeMap();
 
             try {
+                Log.d(TAG, "get device info : " + deviceSerial);
                 EZDeviceInfo deviceInfo = EZOpenSDK.getInstance().getDeviceInfo(deviceSerial);
-
                 return deviceInfo;
             } catch (BaseException e) {
                 ErrorInfo errorInfo = (ErrorInfo) e.getObject();
@@ -89,7 +87,7 @@ public class EzvizView extends ViewGroup {
         @Override
         protected void onPostExecute(EZDeviceInfo result) {
             if (result == null) {
-                Log.d(TAG, "获取设备信息失败，请检查设备序列号是否正确！");
+                Log.d(TAG, "获取设备信息失败，请检查设备序列号是否正确!");
             } else {
                 mDeviceInfo = result;
                 mCameraInfo = mDeviceInfo.getCameraInfoList().get(0);
@@ -115,9 +113,62 @@ public class EzvizView extends ViewGroup {
         mSurfaceViewRenderer.setVerifyCode(verifyCode);
     }
 
+    public void executeCommand(final ReadableMap cmdObject) {
+        Log.d(TAG, "cmdObject : " + cmdObject.toString());
+
+        if (cmdObject.hasKey("type")) {
+            switch (cmdObject.getString("type")) {
+                case "play":
+                    mSurfaceViewRenderer.startRealPlay();
+                    break;
+                case "stop":
+                    mSurfaceViewRenderer.stopRealPlay();
+                    break;
+                case "openSound":
+                    mSurfaceViewRenderer.openSound();
+                    break;
+                case "closeSound":
+                    mSurfaceViewRenderer.closeSound();
+                    break;
+                case "startVoiceTalk":
+                    mSurfaceViewRenderer.startVoiceTalk();
+                    break;
+                case "stopVoiceTalk":
+                    mSurfaceViewRenderer.stopVoiceTalk();
+                    break;
+                case "controlPTZ": {
+                    EZConstants.EZPTZCommand command;
+                    EZConstants.EZPTZAction action;
+                    if (!cmdObject.hasKey("command") && !cmdObject.hasKey("action"))
+                        break;
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                EZOpenSDK.getInstance().controlPTZ(mCameraInfo.getDeviceSerial(),
+                                        mCameraInfo.getCameraNo(),
+                                        EZConstants.EZPTZCommand.valueOf(cmdObject.getString("command")),
+                                        EZConstants.EZPTZAction.valueOf(cmdObject.getString("action")),
+                                        EZConstants.PTZ_SPEED_DEFAULT);
+                            } catch (BaseException e) {
+                                e.printStackTrace();
+                                Log.d(TAG, "controlPTZ error ! " + e.getMessage());
+                            }
+                        }
+                    }).start();
+
+                }
+                break;
+                default:
+                    break;
+            }
+        }
+    }
+
     public void release() {
         if (mSurfaceViewRenderer != null) {
-            mSurfaceViewRenderer.stopRealPlay();
+            mSurfaceViewRenderer.release();
             mSurfaceViewRenderer = null;
         }
     }

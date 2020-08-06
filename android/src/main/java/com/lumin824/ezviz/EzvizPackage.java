@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.Arrays;
 
 public class EzvizPackage implements ReactPackage {
-  @Override
-  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-    return Arrays.<NativeModule>asList(
-      new EzvizModule(reactContext)
-    );
-  }
+    @Override
+    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+        return Arrays.<NativeModule>asList(
+                new EzvizModule(reactContext)
+        );
+    }
 
-  @Override
-  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-    return Arrays.<ViewManager>asList(
-      new EzvizManager()
-    );
-  }
+    @Override
+    public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+        return Arrays.<ViewManager>asList(
+                new EzvizManager()
+        );
+    }
 }
