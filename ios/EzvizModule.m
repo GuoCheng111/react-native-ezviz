@@ -32,6 +32,10 @@ rejecter:(RCTPromiseRejectBlock)reject){
     resolve(nil);
 }
 
++ (BOOL)requiresMainQueueSetup
+{
+    return YES;
+}
 
 -(NSDictionary*) constantsToExport
 {
