@@ -130,8 +130,11 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
 
     public void release() {
         stopRealPlay();
-        mEzPlayer.release();
-        mEzPlayer = null;
+        if(mEzPlayer!=null){
+            mEzPlayer.release();
+            mEzPlayer = null;
+        }
+
     }
 
     @Override
