@@ -1,7 +1,7 @@
 #import "EzvizView.h"
 
-#import "EZOpenSDK/EZOpenSDK.h"
-#import "EZOpenSDK/EZPlayer.h"
+#import "EZOpenSDK.h"
+#import "EZPlayer.h"
 
 @implementation EzvizView
 

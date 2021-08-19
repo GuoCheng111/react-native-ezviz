@@ -2,9 +2,9 @@
 #import <React/RCTBridgeModule.h>
 #import "RCTUIManager.h"
 
-#import "EZOpenSDK/EZOpenSDK.h"
-#import "EZOpenSDK/EZCameraInfo.h"
-#import "EZOpenSDK/EZDeviceInfo.h"
+#import "EZOpenSDK.h"
+#import "EZCameraInfo.h"
+#import "EZDeviceInfo.h"
 
 @interface EzvizModule: NSObject<RCTBridgeModule>
 
@@ -17,8 +17,11 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(setAccessToken:(NSString *)token
 resolver:(RCTPromiseResolveBlock)resolve
 rejecter:(RCTPromiseRejectBlock)reject){
+    NSLog(@"setAccessToken %@",token);
+    [EZOpenSDK setAccessToken:token];
     resolve(nil);
 }
+
 
 RCT_EXPORT_METHOD(getDeviceInfo:(NSString *)deviceSerial
 resolver:(RCTPromiseResolveBlock)resolve
@@ -29,6 +32,7 @@ rejecter:(RCTPromiseRejectBlock)reject){
 RCT_EXPORT_METHOD(init:(NSString *)appKey
 resolver:(RCTPromiseResolveBlock)resolve
 rejecter:(RCTPromiseRejectBlock)reject){
+    [EZOpenSDK initLibWithAppKey:appKey];
     resolve(nil);
 }
 
@@ -43,7 +47,7 @@ rejecter:(RCTPromiseRejectBlock)reject){
         @"EZPTZAction_EZPTZActionSTART":@(EZPTZActionStart),
         @"EZPTZAction_EZPTZActionSTOP":@(EZPTZActionStop),
         @"EZPTZCommand_EZPTZCommandLeft":@(EZPTZCommandLeft),
-        @"EZPTZCommand_EZPTZCommandRight":@(EZPtzCommandRight),
+        @"EZPTZCommand_EZPTZCommandRight":@(EZPTZCommandRight),
         @"EZPTZCommand_EZPTZCommandUp":@(EZPTZCommandUp),
         @"EZPTZCommand_EZPTZCommandDown":@(EZPTZCommandDown),
     };
@@ -61,7 +65,7 @@ RCT_ENUM_CONVERTER(EZPTZAction, (@{
 @implementation RCTConvert(EZPTZCommand)
 RCT_ENUM_CONVERTER(EZPTZCommand, (@{
     @"EZPTZCommand_EZPTZCommandLeft":@(EZPTZCommandLeft),
-    @"EZPTZCommand_EZPTZCommandRight":@(EZPtzCommandRight),
+    @"EZPTZCommand_EZPTZCommandRight":@(EZPTZCommandRight),
     @"EZPTZCommand_EZPTZCommandUp":@(EZPTZCommandUp),
     @"EZPTZCommand_EZPTZCommandDown":@(EZPTZCommandDown),
 }), EZPTZCommandLeft, integerValue)
