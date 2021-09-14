@@ -31,10 +31,10 @@ repositories {
 
 dependencies {
     /*萤石SDK核心模块，必须依赖*/
-    implementation 'com.ezviz.sdk:ezviz-sdk:4.13.0'
+    implementation 'com.ezviz.sdk:ezviz-sdk:4.16.1'
     /*视频通话模块，按需使用*/
-    implementation 'com.ezviz.sdk:videotalk:1.0.0'
+    implementation 'com.ezviz.sdk:videotalk:1.2.0'
     /*码流获取模块，按需使用*/
-    implementation 'com.ezviz.sdk:streamctrl:1.0.0'
+    implementation 'com.ezviz.sdk:streamctrl:1.2.0'
   compile "com.facebook.react:react-native:+"
 }
