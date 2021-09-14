@@ -137,12 +137,11 @@ public class EzvizModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void release(Promise promise) {
+    public void releaseLib() {
         if(mInit){
             mInit = false;
             EZOpenSDK.finiLib();
         }
-        promise.resolve(null);
     }
 
     @ReactMethod

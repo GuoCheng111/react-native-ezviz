@@ -36,6 +36,10 @@ rejecter:(RCTPromiseRejectBlock)reject){
     resolve(nil);
 }
 
+RCT_EXPORT_METHOD(releaseLib){
+    [EZOpenSDK destoryLib];
+}
+
 + (BOOL)requiresMainQueueSetup
 {
     return YES;
