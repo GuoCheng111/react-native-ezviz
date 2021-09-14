@@ -137,6 +137,15 @@ public class EzvizModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void release(Promise promise) {
+        if(mInit){
+            mInit = false;
+            EZOpenSDK.finiLib();
+        }
+        promise.resolve(null);
+    }
+
+    @ReactMethod
     public void setAccessToken(String accessToken, Promise promise) {
         if (!mInit)
             promise.reject("INIT_ERROR", "init error");
