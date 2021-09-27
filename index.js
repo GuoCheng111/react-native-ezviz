@@ -241,10 +241,11 @@ export default class EzvizView extends Component {
   _onEzvizEvent = (evt) => {
     const { onEzvizEvent } = this.props;
     if (evt.type == 'MSG_REALPLAY_PLAY_SUCCESS') {
-      this.setState({
-        showPoster: false
-      })
-    } else if (evt.type == 'MSG_REALPLAY_STOP_SUCCESS') {
+      if (this.props.poster)
+        this.setState({
+          showPoster: false
+        })
+    } else if (evt.type == 'MSG_REALPLAY_STOP_SUCCESS' || evt.type == 'MSG_REALPLAY_PLAY_FAIL') {
       if (this.props.poster)
         this.setState({
           showPoster: true
