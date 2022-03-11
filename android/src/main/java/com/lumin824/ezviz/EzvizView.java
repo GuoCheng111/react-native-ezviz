@@ -91,10 +91,11 @@ public class EzvizView extends ViewGroup {
             } else {
                 mDeviceInfo = result;
                 mCameraInfo = mDeviceInfo.getCameraInfoList().get(0);
+                if(mSurfaceViewRenderer != null){
+                    mSurfaceViewRenderer.setDeviceInfo(mDeviceInfo);
 
-                mSurfaceViewRenderer.setDeviceInfo(mDeviceInfo);
-
-                mSurfaceViewRenderer.startRealPlay();
+                    mSurfaceViewRenderer.startRealPlay();
+                }
             }
         }
     }
