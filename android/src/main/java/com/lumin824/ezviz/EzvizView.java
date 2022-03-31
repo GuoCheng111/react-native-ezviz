@@ -31,6 +31,8 @@ import static com.videogo.openapi.EZConstants.MSG_VIDEO_SIZE_CHANGED;
 
 public class EzvizView extends ViewGroup {
     private static final String TAG = EzvizView.class.getSimpleName();
+    private String mDeviceSerial = null;
+    private String mVerifyCode = null;
     private EZDeviceInfo mDeviceInfo = null;
     private EZCameraInfo mCameraInfo = null;
 
@@ -38,6 +40,9 @@ public class EzvizView extends ViewGroup {
 
     private ThemedReactContext mContext;
     private DeviceEventManagerModule.RCTDeviceEventEmitter mJSModule = null;
+
+    private GetDeviceInfoistTask mTask = null;
+
 
     public EzvizView(ThemedReactContext context) {
         super(context);
@@ -93,25 +98,30 @@ public class EzvizView extends ViewGroup {
                 mCameraInfo = mDeviceInfo.getCameraInfoList().get(0);
                 if(mSurfaceViewRenderer != null){
                     mSurfaceViewRenderer.setDeviceInfo(mDeviceInfo);
-
+                    mSurfaceViewRenderer.setVerifyCode(mVerifyCode);
+                    Log.d(TAG, "startRealPlay");
                     mSurfaceViewRenderer.startRealPlay();
+                }else{
+                    Log.d(TAG, "mSurfaceViewRenderer is null");
                 }
             }
         }
     }
 
     public void setDeviceSerial(String deviceSerial) {
-        if (mSurfaceViewRenderer != null) {
-            mSurfaceViewRenderer.stopRealPlay();
-        }
-
-        if (deviceSerial != null) {
-            new GetDeviceInfoistTask(deviceSerial).execute();
+        if(mDeviceSerial != deviceSerial){
+            mDeviceSerial = deviceSerial;
+            if(mTask != null && !mTask.isCancelled() && mTask.getStatus() == AsyncTask.Status.RUNNING ){
+                mTask.cancel(true);
+            }
+            Log.d(TAG, "setDeviceSerial ! create task");
+            mTask = new GetDeviceInfoistTask(mDeviceSerial);
         }
     }
 
     public void setVerifyCode(String verifyCode) {
-        mSurfaceViewRenderer.setVerifyCode(verifyCode);
+        mVerifyCode = verifyCode;
+
     }
 
     public void executeCommand(final ReadableMap cmdObject) {
@@ -120,9 +130,23 @@ public class EzvizView extends ViewGroup {
         if (cmdObject.hasKey("type")) {
             switch (cmdObject.getString("type")) {
                 case "play":
-                    mSurfaceViewRenderer.startRealPlay();
+                    if(mTask == null){
+                        mTask = new GetDeviceInfoistTask(mDeviceSerial);
+                        mTask.execute();
+                    }else{
+                        Log.d(TAG, "status of mTask : " + mTask.getStatus());
+                        if(mTask.getStatus() == AsyncTask.Status.FINISHED)
+                            mSurfaceViewRenderer.startRealPlay();
+                        else if( mTask.getStatus() == AsyncTask.Status.PENDING)
+                            mTask.execute();
+                    }
+
                     break;
                 case "stop":
+                    if(mTask != null && !mTask.isCancelled() && mTask.getStatus() == AsyncTask.Status.RUNNING ){
+                        mTask.cancel(true);
+                        mTask = null;
+                    }
                     mSurfaceViewRenderer.stopRealPlay();
                     break;
                 case "openSound":

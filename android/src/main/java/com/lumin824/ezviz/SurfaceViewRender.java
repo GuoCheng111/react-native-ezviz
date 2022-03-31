@@ -69,9 +69,13 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
         if (mEzPlayer == null)
             return;
 
-        if (mStatus == RealPlayStatus.STATUS_PLAY)
+        Log.d(TAG, "mStatus : " + mStatus);
+        if (mStatus == RealPlayStatus.STATUS_PLAY || mStatus == RealPlayStatus.STATUS_START){
+            Log.d(TAG, "already  connect or play ! ignore");
             return;
+        }
 
+        Log.d(TAG, "startRealPlay");
         mEzPlayer.setHandler(mHandler);
 
         mEzPlayer.setSurfaceHold(getHolder());
@@ -82,8 +86,8 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
     public void stopRealPlay() {
         if (mEzPlayer == null)
             return;
-        if (mStatus == RealPlayStatus.STATUS_STOP)
-            return;
+//        if (mStatus == RealPlayStatus.STATUS_STOP)
+//            return;
 
         mEzPlayer.stopRealPlay();
     }
@@ -176,9 +180,9 @@ public class SurfaceViewRender extends SurfaceView implements SurfaceHolder.Call
         switch (msg.what) {
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_CONNECTION_START:
                 params.putString("type", "MSG_REALPLAY_CONNECTION_START");
+                mStatus = RealPlayStatus.STATUS_START;
                 break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_START:
-                mStatus = RealPlayStatus.STATUS_START;
                 params.putString("type", "MSG_REALPLAY_PLAY_START");
                 break;
             case EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_SUCCESS:

@@ -11,6 +11,7 @@ import {
   findNodeHandle
 } from 'react-native';
 import PropTypes from 'prop-types';
+import Logger from 'cpclog';
 
 export var { EzvizModule } = NativeModules;
 
@@ -26,6 +27,13 @@ export var EZPTZAction = {
   EZPTZActionStop: EzvizModule.EZPTZAction_EZPTZActionSTOP
 };
 
+const logger = Logger.createWrapper('EzvizView', Logger.LEVEL_DEBUG);
+
+const EZVIZ_PLAY_STATUS_CONNECTING = 1;
+const EZVIZ_PLAY_STATUS_PLAY = 2;
+const EZVIZ_PLAY_STATUS_STOP = 3;
+const EZVIZ_PLAY_STATUS_UNKNOWN = -1;
+
 export default class EzvizView extends Component {
   constructor(props) {
     super(props);
@@ -37,6 +45,8 @@ export default class EzvizView extends Component {
     this.state = {
       showPoster: !!props.poster
     }
+
+    this.status = EZVIZ_PLAY_STATUS_UNKNOWN;
   }
 
   componentDidMount() {
@@ -56,6 +66,8 @@ export default class EzvizView extends Component {
       this.deviceSerial = deviceSerial;
       this.verifyCode = verifyCode;
 
+      if (this.status == EZVIZ_PLAY_STATUS_CONNECTING || this.status == EZVIZ_PLAY_STATUS_PLAY)
+        this.stop();
       this.getDeviceInfo();
       this.forceUpdate();
     }
@@ -90,21 +102,31 @@ export default class EzvizView extends Component {
       type: 'play'
     }
 
+    logger.debug('go to play ! ', this.status);
+
+    if (this.status == EZVIZ_PLAY_STATUS_CONNECTING || this.status == EZVIZ_PLAY_STATUS_PLAY) {
+      logger.debug('already play ! ignore !');
+      return;
+    }
+
+    this.status = EZVIZ_PLAY_STATUS_CONNECTING;
     UIManager.dispatchViewManagerCommand(
       this._ezvizHandle,
       this._getViewManagerConfig('Ezviz').Commands.play,
       [cmd],
     );
-
-    // this.setNativeProps({
-    //   command: cmd
-    // })
   }
 
   stop() {
     let cmd = {
       type: 'stop'
     }
+
+    this.status = EZVIZ_PLAY_STATUS_STOP;
+
+    this.setState({
+      showPoster: true
+    });
 
     UIManager.dispatchViewManagerCommand(
       this._ezvizHandle,
@@ -245,11 +267,17 @@ export default class EzvizView extends Component {
         this.setState({
           showPoster: false
         })
+      this.status = EZVIZ_PLAY_STATUS_PLAY;
     } else if (evt.type == 'MSG_REALPLAY_STOP_SUCCESS' || evt.type == 'MSG_REALPLAY_PLAY_FAIL') {
       if (this.props.poster)
         this.setState({
           showPoster: true
         })
+      if (evt.type == 'MSG_REALPLAY_PLAY_FAIL') {
+        this.status = EZVIZ_PLAY_STATUS_UNKNOWN;
+      } else if (evt.type == 'MSG_REALPLAY_STOP_SUCCESS') {
+        this.status = EZVIZ_PLAY_STATUS_STOP;
+      }
     }
 
     if (onEzvizEvent) {
@@ -263,11 +291,18 @@ export default class EzvizView extends Component {
       ...StyleSheet.absoluteFillObject,
       ...this.props.style,
       resizeMode: this.props.posterResizeMode || 'contain',
+      zIndex: 99
     };
 
+    const nativeProps = Object.assign({}, this.props);
+		Object.assign(nativeProps, {
+			style: [styles.base, nativeProps.style]
+		});
+
+
     return (
-      <View style={[this.props.style]}>
-        <Ezviz ref={this._setReference} style={StyleSheet.absoluteFill} deviceSerial={deviceSerial} verifyCode={verifyCode} />
+      <View style={nativeProps.style}>
+        <Ezviz ref={this._setReference} {...nativeProps}  style={StyleSheet.absoluteFill} deviceSerial={deviceSerial} verifyCode={verifyCode} />
         {this.state.showPoster && (
           <Image style={posterStyle} source={this.props.poster} />
         )}
@@ -275,6 +310,12 @@ export default class EzvizView extends Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+	base: {
+		overflow: 'hidden'
+	}
+});
 
 EzvizView.propTypes = {
   deviceSerial: PropTypes.string.isRequired,
