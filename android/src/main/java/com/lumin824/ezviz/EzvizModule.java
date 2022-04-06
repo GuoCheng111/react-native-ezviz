@@ -122,14 +122,16 @@ public class EzvizModule extends ReactContextBaseJavaModule {
         Log.d(TAG, "init! appKey : " + appKey);
         Application application = (Application) mContext.getBaseContext();
 
-        EZOpenSDK.showSDKLog(true);
-        // 设置是否支持P2P取流,详见api
-        EZOpenSDK.enableP2P(true);
-        // APP_KEY请替换成自己申请
-        if (!EZOpenSDK.initLib(application, appKey)) {
-            Log.d(TAG, "EZOpenSDK.initLib error");
-            promise.reject("ERROR_INIT", "EZOpenSDK.initLib error");
-            return;
+        if( EZOpenSDK.getInstance() == null){
+            EZOpenSDK.showSDKLog(true);
+            // 设置是否支持P2P取流,详见api
+            EZOpenSDK.enableP2P(true);
+            // APP_KEY请替换成自己申请
+            if (!EZOpenSDK.initLib(application, appKey)) {
+                Log.d(TAG, "EZOpenSDK.initLib error");
+                promise.reject("ERROR_INIT", "EZOpenSDK.initLib error");
+                return;
+            }
         }
 
         mInit = true;
