@@ -92,7 +92,9 @@ public class EzvizView extends ViewGroup {
         @Override
         protected void onPostExecute(EZDeviceInfo result) {
             if (result == null) {
-                Log.d(TAG, "获取设备信息失败，请检查设备序列号是否正确!");
+                //Log.d(TAG, "获取设备信息失败，请检查设备序列号是否正确!");
+                //重置
+                mTask = null;                
             } else {
                 mDeviceInfo = result;
                 mCameraInfo = mDeviceInfo.getCameraInfoList().get(0);
