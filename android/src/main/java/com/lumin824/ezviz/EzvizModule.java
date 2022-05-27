@@ -108,8 +108,8 @@ public class EzvizModule extends ReactContextBaseJavaModule {
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
-        if (mInit)
-            EZOpenSDK.finiLib();
+//        if (mInit)
+//            EZOpenSDK.finiLib();
     }
 
     static void sendEvent(String eventName, @Nullable WritableMap params) {
